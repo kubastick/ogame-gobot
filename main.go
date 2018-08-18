@@ -6,6 +6,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 var log = setupLogger() //Prepare logger
@@ -56,12 +57,24 @@ func main() {
 			}
 			users = append(users, userData)
 		}
+		//Start infinite loop
+		for {
+			nextIterationTime := time.Now().Second()*1000 + configData.RoundTime
 
-		//Start users loop
-		for i, _ := range users {
-			processUser(&users[i], &configData)
+			//Start users loop
+			for i := range users {
+				processUser(&users[i], &configData)
+			}
+
+			waitTime := nextIterationTime - time.Now().Second()*1000
+			if waitTime > 0 {
+				log.Infof("Round finished, next in %d seconds", waitTime/1000)
+				sleepTime := time.Duration(waitTime) * time.Millisecond
+				time.Sleep(sleepTime)
+			} else {
+				log.Warningf("Consider increasing round time, you are running %d seconds behind", waitTime*-1)
+			}
 		}
-
 	} else {
 		log.Fatal("Directory ./users does not exists, exiting")
 	}
@@ -84,7 +97,7 @@ func processUser(userData *user, configData *config) {
 	log.Info(fmt.Sprintf("User email: %s", userData.Email))
 
 	//Create controller
-	controller := OgameController.NewOgameController(userData.Email, userData.Password, userData.Server, configData.headless)
+	controller := OgameController.NewOgameController(userData.Email, userData.Password, userData.Server, configData.Headless)
 	defer controller.Close()
 	//TODO:Load headless from config (UP 1 LINE) ^
 
