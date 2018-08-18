@@ -163,3 +163,41 @@ func (o *OgameController) getResourceText(id string) (string, error) {
 	elementText, err := element.Text()
 	return elementText, err
 }
+
+func (o *OgameController) CanBuildBuilding(category int, building int) bool {
+	if category == 0 {
+		o.getIfAnother(fmt.Sprintf(MINING_PAGE, o.Server))
+	} else if category == 1 {
+		o.getIfAnother(fmt.Sprintf(STATION_PAGE, o.Server))
+	} else {
+		panic("Paramater outside range")
+	}
+	defer o.driver.SetImplicitWaitTimeout(FIND_TIMEOUT)
+	o.driver.SetImplicitWaitTimeout(CHECK_TIMEOUT)
+	//Click building button
+	buildingButton, _ := o.driver.FindElement(selenium.ByID, fmt.Sprintf("button%d", building))
+	buildingButton.Click()
+	_, err := o.driver.FindElement(selenium.ByClassName, "build-it")
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (o *OgameController) BuildBuilding(category int, building int) error {
+	if category == 0 {
+		o.getIfAnother(fmt.Sprintf(MINING_PAGE, o.Server))
+	} else if category == 1 {
+		o.getIfAnother(fmt.Sprintf(STATION_PAGE, o.Server))
+	} else {
+		panic("Paramater outside range")
+	}
+	defer o.driver.SetImplicitWaitTimeout(FIND_TIMEOUT)
+	o.driver.SetImplicitWaitTimeout(CHECK_TIMEOUT)
+	//Click building button
+	buildingButton, err := o.driver.FindElement(selenium.ByID, fmt.Sprintf("button%d", building))
+	buildingButton.Click()
+	buildButton, err := o.driver.FindElement(selenium.ByClassName, "build-it")
+	buildButton.Click()
+	return err
+}

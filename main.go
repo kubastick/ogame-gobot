@@ -16,8 +16,16 @@ func main() {
 	log.Info("Getting file list from ./users directory")
 
 	//Check for config
+	configData := config{Headless: true, RoundTime: 120000}
 	if fileExists("./config.toml") {
-		//TODO: config loading
+		data, err := ioutil.ReadFile("./config.toml")
+		if err != nil {
+			log.Fatal(err)
+		}
+		if _, err := toml.Decode(string(data), &configData); err != nil {
+			log.Fatal(err)
+		}
+		log.Info(configData.Headless)
 	} else {
 		log.Warning("Can't find config.toml using optimal defaults")
 	}
@@ -51,7 +59,7 @@ func main() {
 
 		//Start users loop
 		for i, _ := range users {
-			processUser(&users[i])
+			processUser(&users[i], &configData)
 		}
 
 	} else {
@@ -70,13 +78,13 @@ func fileExists(name string) bool {
 	return !os.IsNotExist(err)
 }
 
-func processUser(userData *user) {
+func processUser(userData *user, configData *config) {
 	log.Info("Starting user processing")
 	//Log user name
 	log.Info(fmt.Sprintf("User email: %s", userData.Email))
 
 	//Create controller
-	controller := OgameController.NewOgameController(userData.Email, userData.Password, userData.Server, false)
+	controller := OgameController.NewOgameController(userData.Email, userData.Password, userData.Server, configData.headless)
 	defer controller.Close()
 	//TODO:Load headless from config (UP 1 LINE) ^
 
@@ -88,6 +96,7 @@ func processUser(userData *user) {
 		return
 	}
 
+	//Fetch resources
 	log.Info("Fetching resources")
 	err2 := controller.FetchResources()
 	if err2 != nil {
@@ -99,4 +108,26 @@ func processUser(userData *user) {
 		controller.Crystal,
 		controller.Deuterium,
 		controller.Energy))
+
+	//Build all buildings (temporary)
+	for _, n := range []int{1, 2, 3, 4, 5, 7, 8, 9} {
+		if controller.CanBuildBuilding(OgameController.MINING_BUILDINGS, n) {
+			log.Info("Upgrading mining building")
+			err := controller.BuildBuilding(OgameController.MINING_BUILDINGS, n)
+			if err != nil {
+				log.Warningf("Build is impossible %s", err.Error())
+			}
+		}
+	}
+
+	for _, n := range []int{0, 1, 2, 3, 4, 5, 6, 7} {
+		if controller.CanBuildBuilding(OgameController.STATION_BUILDINGS, n) {
+			log.Info("Upgrading station building")
+			err := controller.BuildBuilding(OgameController.STATION_BUILDINGS, n)
+			if err != nil {
+				log.Warningf("Build is impossible %s", err.Error())
+			}
+		}
+	}
+
 }
