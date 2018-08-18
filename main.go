@@ -1,0 +1,60 @@
+package main
+
+import (
+	"fmt"
+	"github.com/BurntSushi/toml"
+	"io/ioutil"
+	"os"
+)
+
+func main() {
+	var log = setupLogger()
+	//Hello dear users ^^
+	log.Info("Ogame bot. All rights reserved. Copyright 2018 kubastick.")
+	log.Info("Getting file list from ./users directory")
+
+	//Check for config
+	if fileExists("./config.toml") {
+
+	} else {
+		log.Warning("Can't find config.toml using optimal defaults")
+	}
+
+	//Declare users
+	var users []user
+
+	//Load users
+	if fileExists("./users") {
+		files, err := ioutil.ReadDir("./users")
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, file := range files {
+			//Log to console
+			log.Info(fmt.Sprintf("Reading file:%s", file.Name()))
+			//Read file to ram
+			data, err := ioutil.ReadFile("./users/" + file.Name())
+			if err != nil {
+				log.Fatal(err)
+			}
+			var userData user
+			if _, err := toml.Decode(string(data), &userData); err != nil {
+				log.Fatal(err)
+			}
+			users = append(users, userData)
+		}
+	} else {
+		log.Fatal("Directory ./users does not exists, exiting")
+	}
+
+	/*service, err := selenium.NewRemote(selenium.Capabilities{"browserName":"Chrome"},"http://localhost:4444/wd/hub")
+	if(err!=nil) {
+		logger.Fatal(err)
+	}
+	defer service.Quit()*/
+}
+
+func fileExists(name string) bool {
+	_, err := os.Stat(name)
+	return !os.IsNotExist(err)
+}
