@@ -1,6 +1,7 @@
 package main
 
 import (
+	"OgameBot/OgameController"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"io/ioutil"
@@ -16,7 +17,7 @@ func main() {
 
 	//Check for config
 	if fileExists("./config.toml") {
-
+		//TODO: config loading
 	} else {
 		log.Warning("Can't find config.toml using optimal defaults")
 	}
@@ -74,4 +75,17 @@ func processUser(userData *user) {
 	//Log user name
 	log.Info(fmt.Sprintf("User email: %s", userData.Email))
 
+	//Create controller
+	controller := OgameController.NewOgameController(userData.Email, userData.Password, userData.Server, false)
+	defer controller.Close()
+	//TODO:Load headless from config (UP 1 LINE) ^
+
+	//Login
+	log.Info("Logging in")
+	err := controller.LoginF()
+	if err != nil {
+		log.Error(err)
+	}
+
+	log.Info("Fetching resources")
 }
