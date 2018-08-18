@@ -25,6 +25,5 @@ func setupLogger() *logging.Logger {
 
 	// Set the backends to be used.
 	logging.SetBackend(backend2Formatter)
-	log.Info("Logger ready")
 	return log
 }

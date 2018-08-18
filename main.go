@@ -7,8 +7,9 @@ import (
 	"os"
 )
 
+var log = setupLogger() //Prepare logger
+
 func main() {
-	var log = setupLogger()
 	//Hello dear users ^^
 	log.Info("Ogame bot. All rights reserved. Copyright 2018 kubastick.")
 	log.Info("Getting file list from ./users directory")
@@ -25,13 +26,16 @@ func main() {
 
 	//Load users
 	if fileExists("./users") {
+		//Load users
 		files, err := ioutil.ReadDir("./users")
 		if err != nil {
 			log.Fatal(err)
 		}
 		for _, file := range files {
+
 			//Log to console
-			log.Info(fmt.Sprintf("Reading file:%s", file.Name()))
+			log.Info(fmt.Sprintf("Reading file: %s", file.Name()))
+
 			//Read file to ram
 			data, err := ioutil.ReadFile("./users/" + file.Name())
 			if err != nil {
@@ -43,6 +47,12 @@ func main() {
 			}
 			users = append(users, userData)
 		}
+
+		//Start users loop
+		for i, _ := range users {
+			processUser(&users[i])
+		}
+
 	} else {
 		log.Fatal("Directory ./users does not exists, exiting")
 	}
@@ -57,4 +67,11 @@ func main() {
 func fileExists(name string) bool {
 	_, err := os.Stat(name)
 	return !os.IsNotExist(err)
+}
+
+func processUser(userData *user) {
+	log.Info("Starting user processing")
+	//Log user name
+	log.Info(fmt.Sprintf("User email: %s", userData.Email))
+
 }
