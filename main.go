@@ -85,7 +85,18 @@ func processUser(userData *user) {
 	err := controller.LoginF()
 	if err != nil {
 		log.Error(err)
+		return
 	}
 
 	log.Info("Fetching resources")
+	err2 := controller.FetchResources()
+	if err2 != nil {
+		log.Error(err2)
+		return
+	}
+	log.Info(fmt.Sprintf("Current resources: Metal %d, Crystal %d, Deuterium %d,Energy %d",
+		controller.Metal,
+		controller.Crystal,
+		controller.Deuterium,
+		controller.Energy))
 }

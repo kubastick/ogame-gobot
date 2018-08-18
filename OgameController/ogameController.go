@@ -5,6 +5,8 @@ import (
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -94,32 +96,70 @@ func (o *OgameController) LoginF() error {
 	universumButton, err := o.driver.FindElement(selenium.ByXPATH, "//*[@id=\"accountlist\"]/div/div[1]/div[2]/div/div/div[11]/button")
 	universumButton.Click()
 	//Wait for JS to load
-	time.Sleep(1000 * time.Second)
+	time.Sleep(1 * time.Second)
 	//Login to cosmic server
 	o.driver.Get(fmt.Sprintf(MAIN_PAGE, o.Server))
-	o.closeOtherTabs()
-
+	//o.closeOtherTabs() //causing segmentation fault
 	return err
 }
 
 func (o *OgameController) closeOtherTabs() {
-	mainWindow, _ := o.driver.CurrentWindowHandle()
-	allWindows, _ := o.driver.WindowHandles()
+	mainWindow, err := o.driver.CurrentWindowHandle()
+	println(err)
+	allWindows, err := o.driver.WindowHandles()
 	for _, handle := range allWindows {
 		if handle != mainWindow {
 			o.driver.CloseWindow(handle)
 		}
 	}
+	o.driver.SwitchWindow(mainWindow)
 }
 
 func (o *OgameController) Close() {
+	allWindows, _ := o.driver.WindowHandles()
+	for _, handle := range allWindows {
+		o.driver.CloseWindow(handle)
+	}
 	o.driver.Close()
 }
 
-func (o *OgameController) FetchResources() {
+func (o *OgameController) FetchResources() error {
+	o.getIfAnother(fmt.Sprintf(MAIN_PAGE, o.Server))
 
+	//Metal
+	metalText, err := o.getResourceText("resources_metal")
+	o.Metal = o.parseResourceText(metalText)
+	//Crystal
+	crystalText, err := o.getResourceText("resources_crystal")
+	o.Crystal = o.parseResourceText(crystalText)
+	//Deuterium
+	deuteriumText, err := o.getResourceText("resources_deuterium")
+	o.Deuterium = o.parseResourceText(deuteriumText)
+	//Energy
+	energyText, err := o.getResourceText("resources_energy")
+	o.Energy = o.parseResourceText(energyText)
+	return err
 }
 
 func (o *OgameController) getIfAnother(url string) {
+	currentURL, _ := o.driver.CurrentURL()
+	if currentURL != url {
+		o.driver.Get(url)
+	}
+}
 
+func (o *OgameController) parseResourceText(text string) int {
+	//Remove whitespaces
+	text2 := strings.Replace(text, " ", "", -1)
+	//Remove dots
+	text3 := strings.Replace(text2, ".", "", -1)
+	//return
+	result, _ := strconv.Atoi(text3)
+	return result
+}
+
+func (o *OgameController) getResourceText(id string) (string, error) {
+	element, err := o.driver.FindElement(selenium.ByID, id)
+	elementText, err := element.Text()
+	return elementText, err
 }
