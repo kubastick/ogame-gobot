@@ -99,19 +99,19 @@ func (o *OgameController) LoginF() error {
 	time.Sleep(1 * time.Second)
 	//Login to cosmic server
 	o.driver.Get(fmt.Sprintf(MAIN_PAGE, o.Server))
-	//o.closeOtherTabs() //causing segmentation fault
+	o.closeOtherTabs() //causing segmentation fault
 	return err
 }
 
 func (o *OgameController) closeOtherTabs() {
 	mainWindow, err := o.driver.CurrentWindowHandle()
-	println(err)
 	allWindows, err := o.driver.WindowHandles()
 	for _, handle := range allWindows {
 		if handle != mainWindow {
 			o.driver.CloseWindow(handle)
 		}
 	}
+	mainWindow, err = o.driver.CurrentWindowHandle() //This is weird, but it prevent's errors
 	o.driver.SwitchWindow(mainWindow)
 }
 
@@ -190,7 +190,7 @@ func (o *OgameController) BuildBuilding(category int, building int) error {
 	} else if category == 1 {
 		o.getIfAnother(fmt.Sprintf(STATION_PAGE, o.Server))
 	} else {
-		panic("Paramater outside range")
+		panic("Parameter outside range")
 	}
 	defer o.driver.SetImplicitWaitTimeout(FIND_TIMEOUT)
 	o.driver.SetImplicitWaitTimeout(CHECK_TIMEOUT)
