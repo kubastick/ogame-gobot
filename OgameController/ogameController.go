@@ -23,11 +23,11 @@ const (
 
 type OgameController struct {
 	//Constructors
-	Login    string
-	Password string
-	Server   string
-	Headless bool
-
+	Login          string
+	Password       string
+	Server         string
+	Headless       bool
+	ServerButtonID int
 	//Driver
 	driver selenium.WebDriver
 
@@ -38,14 +38,15 @@ type OgameController struct {
 	Energy    int
 }
 
-func NewOgameController(login string, password string, server string, headless bool) OgameController {
+func NewOgameController(seleniumAdress string, login string, password string, server string, serverButtonID int, headless bool) OgameController {
 
 	//Create OgameController object
 	controller := OgameController{
-		Login:    login,
-		Password: password,
-		Server:   server,
-		Headless: headless,
+		Login:          login,
+		Password:       password,
+		Server:         server,
+		Headless:       headless,
+		ServerButtonID: serverButtonID,
 	}
 	//Add chrome specific options
 	options := chrome.Capabilities{}
@@ -93,7 +94,7 @@ func (o *OgameController) LoginF() error {
 	submitButton, err := o.driver.FindElement(selenium.ByID, "loginSubmit")
 	submitButton.Click()
 	//Uni button
-	universumButton, err := o.driver.FindElement(selenium.ByXPATH, "//*[@id=\"accountlist\"]/div/div[1]/div[2]/div/div/div[11]/button")
+	universumButton, err := o.driver.FindElement(selenium.ByXPATH, fmt.Sprintf("//*[@id=\"accountlist\"]/div/div[1]/div[2]/div/div/div[%d]/button", o.ServerButtonID))
 	universumButton.Click()
 	//Wait for JS to load
 	time.Sleep(1 * time.Second)
@@ -104,14 +105,14 @@ func (o *OgameController) LoginF() error {
 }
 
 func (o *OgameController) closeOtherTabs() {
-	mainWindow, err := o.driver.CurrentWindowHandle()
-	allWindows, err := o.driver.WindowHandles()
+	mainWindow, _ := o.driver.CurrentWindowHandle()
+	allWindows, _ := o.driver.WindowHandles()
 	for _, handle := range allWindows {
 		if handle != mainWindow {
 			o.driver.CloseWindow(handle)
 		}
 	}
-	mainWindow, err = o.driver.CurrentWindowHandle() //This is weird, but it prevent's errors
+	mainWindow, _ = o.driver.CurrentWindowHandle() //This is weird, but it prevent's errors
 	o.driver.SwitchWindow(mainWindow)
 }
 

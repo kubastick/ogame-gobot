@@ -1,7 +1,8 @@
 package main
 
 type user struct {
-	Email    string
-	Password string
-	Server   string
+	Email          string
+	Password       string
+	Server         string
+	ServerButtonId int
 }

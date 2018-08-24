@@ -17,7 +17,7 @@ func main() {
 	log.Info("Getting file list from ./users directory")
 
 	//Check for config
-	configData := config{Headless: true, RoundTime: 120000}
+	configData := config{Headless: true, RoundTime: 120000, SeleniumURL: "http://localhost:4444/wd/hub"}
 	if fileExists("./config.toml") {
 		data, err := ioutil.ReadFile("./config.toml")
 		if err != nil {
@@ -26,7 +26,6 @@ func main() {
 		if _, err := toml.Decode(string(data), &configData); err != nil {
 			log.Fatal(err)
 		}
-		log.Info(configData.Headless)
 	} else {
 		log.Warning("Can't find config.toml using optimal defaults")
 	}
@@ -97,7 +96,13 @@ func processUser(userData *user, configData *config) {
 	log.Info(fmt.Sprintf("User email: %s", userData.Email))
 
 	//Create controller
-	controller := OgameController.NewOgameController(userData.Email, userData.Password, userData.Server, configData.Headless)
+	controller := OgameController.NewOgameController(
+		configData.SeleniumURL,
+		userData.Email,
+		userData.Password,
+		userData.Server,
+		userData.ServerButtonId,
+		configData.Headless)
 	defer controller.Close()
 	//TODO:Load headless from config (UP 1 LINE) ^
 
