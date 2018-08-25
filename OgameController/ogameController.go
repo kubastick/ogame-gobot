@@ -192,8 +192,14 @@ func (o *OgameController) parseResourceText(text string) int {
 
 func (o *OgameController) getResourceText(id string) (string, error) {
 	element, err := o.driver.FindElement(selenium.ByID, id)
+	if err != nil {
+		return "", err
+	}
 	elementText, err := element.Text()
-	return elementText, err
+	if err != nil {
+		return "", err
+	}
+	return elementText, nil
 }
 
 func (o *OgameController) CanBuildBuilding(category int, building int) bool {
