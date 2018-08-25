@@ -80,28 +80,46 @@ func (o *OgameController) LoginF() error {
 
 	//Press login tab
 	loginTab, err := o.driver.FindElement(selenium.ByID, "ui-id-1")
+	if err != nil {
+		return err
+	}
 	loginTab.Click()
 	//Dismiss cookie alert
 	cookieCloseButton, err := o.driver.FindElement(selenium.ByID, "accept_btn")
+	if err != nil {
+		return err
+	}
 	cookieCloseButton.Click()
 	//Send login text
 	usernameLogin, err := o.driver.FindElement(selenium.ByID, "usernameLogin")
+	if err != nil {
+		return err
+	}
 	usernameLogin.SendKeys(o.Login)
 	//Send password text
 	password, err := o.driver.FindElement(selenium.ByID, "passwordLogin")
+	if err != nil {
+		return err
+	}
 	password.SendKeys(o.Password)
 	//Click submit button
 	submitButton, err := o.driver.FindElement(selenium.ByID, "loginSubmit")
+	if err != nil {
+		return err
+	}
 	submitButton.Click()
 	//Uni button
 	universumButton, err := o.driver.FindElement(selenium.ByXPATH, fmt.Sprintf("//*[@id=\"accountlist\"]/div/div[1]/div[2]/div/div/div[%d]/button", o.ServerButtonID))
+	if err != nil {
+		return err
+	}
 	universumButton.Click()
 	//Wait for JS to load
 	time.Sleep(1 * time.Second)
 	//Login to cosmic server
 	o.driver.Get(fmt.Sprintf(MAIN_PAGE, o.Server))
 	o.closeOtherTabs() //causing segmentation fault
-	return err
+	return nil
 }
 
 func (o *OgameController) closeOtherTabs() {
@@ -129,17 +147,29 @@ func (o *OgameController) FetchResources() error {
 
 	//Metal
 	metalText, err := o.getResourceText("resources_metal")
+	if err != nil {
+		return err
+	}
 	o.Metal = o.parseResourceText(metalText)
 	//Crystal
 	crystalText, err := o.getResourceText("resources_crystal")
+	if err != nil {
+		return err
+	}
 	o.Crystal = o.parseResourceText(crystalText)
 	//Deuterium
 	deuteriumText, err := o.getResourceText("resources_deuterium")
+	if err != nil {
+		return err
+	}
 	o.Deuterium = o.parseResourceText(deuteriumText)
 	//Energy
 	energyText, err := o.getResourceText("resources_energy")
+	if err != nil {
+		return err
+	}
 	o.Energy = o.parseResourceText(energyText)
-	return err
+	return nil
 }
 
 func (o *OgameController) getIfAnother(url string) {

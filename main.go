@@ -118,7 +118,7 @@ func processUser(userData *user, configData *config) {
 	log.Info("Fetching resources")
 	err2 := controller.FetchResources()
 	if err2 != nil {
-		log.Error(err2)
+		log.Error("Could not fetch resources:" + err2.Error())
 		return
 	}
 	log.Info(fmt.Sprintf("Current resources: Metal %d, Crystal %d, Deuterium %d,Energy %d",
