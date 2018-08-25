@@ -127,13 +127,31 @@ func processUser(userData *user, configData *config) {
 		controller.Deuterium,
 		controller.Energy))
 
+	//Upgrade power plants first if energy is too low
+	if controller.Energy < 0 {
+		if controller.CanBuildBuilding(OgameController.MINING_BUILDINGS, OgameController.POWER_PLANT) {
+			log.Info("Upgrading power plant because energy is too low")
+			err := controller.BuildBuilding(OgameController.MINING_BUILDINGS, OgameController.POWER_PLANT)
+			if err != nil {
+				log.Warningf("Build is impossible: %s", err.Error())
+			}
+		}
+		if controller.CanBuildBuilding(OgameController.MINING_BUILDINGS, OgameController.DEUTERIUM_POWER_PLANT) {
+			log.Info("Upgrading deuterium power plant because energy is too low")
+			err := controller.BuildBuilding(OgameController.MINING_BUILDINGS, OgameController.DEUTERIUM_POWER_PLANT)
+			if err != nil {
+				log.Warningf("Build is impossible: %s", err.Error())
+			}
+		}
+	}
+
 	//Build all buildings (temporary)
 	for _, n := range []int{1, 2, 3, 4, 5, 7, 8, 9} {
 		if controller.CanBuildBuilding(OgameController.MINING_BUILDINGS, n) {
 			log.Info("Upgrading mining building")
 			err := controller.BuildBuilding(OgameController.MINING_BUILDINGS, n)
 			if err != nil {
-				log.Warningf("Build is impossible %s", err.Error())
+				log.Warningf("Build is impossible: %s", err.Error())
 			}
 		}
 	}

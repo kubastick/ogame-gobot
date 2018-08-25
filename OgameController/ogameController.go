@@ -28,6 +28,7 @@ type OgameController struct {
 	Server         string
 	Headless       bool
 	ServerButtonID int
+
 	//Driver
 	driver selenium.WebDriver
 
@@ -118,7 +119,7 @@ func (o *OgameController) LoginF() error {
 	time.Sleep(1 * time.Second)
 	//Login to cosmic server
 	o.driver.Get(fmt.Sprintf(MAIN_PAGE, o.Server))
-	o.closeOtherTabs() //causing segmentation fault
+	o.closeOtherTabs()
 	return nil
 }
 
