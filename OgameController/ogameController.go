@@ -197,8 +197,15 @@ func (o *OgameController) BuildBuilding(category int, building int) error {
 	o.driver.SetImplicitWaitTimeout(CHECK_TIMEOUT)
 	//Click building button
 	buildingButton, err := o.driver.FindElement(selenium.ByID, fmt.Sprintf("button%d", building))
+	if err != nil {
+		return err
+	}
 	buildingButton.Click()
+	//Click build it button
 	buildButton, err := o.driver.FindElement(selenium.ByClassName, "build-it")
+	if err != nil {
+		return err
+	}
 	buildButton.Click()
 	return err
 }
