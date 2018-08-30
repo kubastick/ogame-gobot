@@ -10,6 +10,8 @@ cd OgameBot
 go get ./...
 go build OgameBot
 ```
+## Download
+https://github.com/kubastick/ogame-gobot/releases
 ## Configuration
 Files:  
 `config.toml` - General settings: Round time, optional slack bot id, etc.  
