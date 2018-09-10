@@ -1,7 +1,7 @@
 # Ogame GO-Bot
 Simple OGame bot that interacts with your account.
 ## Motivation
-I wanted to learn how to use selenium, so the first thing that came to my head is the good old ogame
+I wanted to learn how to use selenium, so the first thing that came to my head was the good old ogame
 ## Build
 ```
 cd $GOPATH/src
