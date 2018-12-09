@@ -1,4 +1,4 @@
-package OgameController
+package controller
 
 type MiningBuildings struct {
 	metalMine           int

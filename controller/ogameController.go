@@ -1,4 +1,4 @@
-package OgameController
+package controller
 
 import (
 	"fmt"
@@ -41,7 +41,7 @@ type OgameController struct {
 
 func NewOgameController(seleniumAdress string, login string, password string, server string, serverButtonID int, headless bool) OgameController {
 
-	//Create OgameController object
+	//Create controller object
 	controller := OgameController{
 		Login:          login,
 		Password:       password,
@@ -84,7 +84,8 @@ func (o *OgameController) LoginF() error {
 	if err != nil {
 		return err
 	}
-	loginTab.Click()
+
+	err = loginTab.Click()
 	//Dismiss cookie alert
 	cookieCloseButton, err := o.driver.FindElement(selenium.ByID, "accept_btn")
 	if err != nil {

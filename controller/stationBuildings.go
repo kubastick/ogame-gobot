@@ -1,4 +1,4 @@
-package OgameController
+package controller
 
 type StationBuildings struct {
 	robotFactory  int

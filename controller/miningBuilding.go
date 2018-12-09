@@ -1,4 +1,4 @@
-package OgameController
+package controller
 
 const (
 	METAL_MINE            = 1

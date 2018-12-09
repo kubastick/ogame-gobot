@@ -1,10 +1,10 @@
 package main
 
 import (
-	"OgameBot/OgameController"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"io/ioutil"
+	"ogamebot/controller"
 	"os"
 	"time"
 )
@@ -15,7 +15,6 @@ func main() {
 	//Hello dear users ^^
 	log.Info("Ogame bot. All rights reserved. Copyright 2018 kubastick.")
 	log.Info("Getting file list from ./users directory")
-
 	//Check for config
 	configData := config{Headless: true, RoundTime: 120000, SeleniumURL: "http://localhost:4444/wd/hub"}
 	if fileExists("./config.toml") {
@@ -96,19 +95,19 @@ func processUser(userData *user, configData *config) {
 	log.Info(fmt.Sprintf("User email: %s", userData.Email))
 
 	//Create controller
-	controller := OgameController.NewOgameController(
+	ogameController := controller.NewOgameController(
 		configData.SeleniumURL,
 		userData.Email,
 		userData.Password,
 		userData.Server,
 		userData.ServerButtonId,
 		configData.Headless)
-	defer controller.Close()
+	defer ogameController.Close()
 	//TODO:Load headless from config (UP 1 LINE) ^
 
 	//Login
 	log.Info("Logging in")
-	err := controller.LoginF()
+	err := ogameController.LoginF()
 	if err != nil {
 		log.Error(err)
 		return
@@ -116,29 +115,29 @@ func processUser(userData *user, configData *config) {
 
 	//Fetch resources
 	log.Info("Fetching resources")
-	err2 := controller.FetchResources()
+	err2 := ogameController.FetchResources()
 	if err2 != nil {
 		log.Error("Could not fetch resources:" + err2.Error())
 		return
 	}
 	log.Info(fmt.Sprintf("Current resources: Metal %d, Crystal %d, Deuterium %d,Energy %d",
-		controller.Metal,
-		controller.Crystal,
-		controller.Deuterium,
-		controller.Energy))
+		ogameController.Metal,
+		ogameController.Crystal,
+		ogameController.Deuterium,
+		ogameController.Energy))
 
 	//Upgrade power plants first if energy is too low
-	if controller.Energy < 0 {
-		if controller.CanBuildBuilding(OgameController.MINING_BUILDINGS, OgameController.POWER_PLANT) {
+	if ogameController.Energy < 0 {
+		if ogameController.CanBuildBuilding(controller.MINING_BUILDINGS, controller.POWER_PLANT) {
 			log.Info("Upgrading power plant because energy is too low")
-			err := controller.BuildBuilding(OgameController.MINING_BUILDINGS, OgameController.POWER_PLANT)
+			err := ogameController.BuildBuilding(controller.MINING_BUILDINGS, controller.POWER_PLANT)
 			if err != nil {
 				log.Warningf("Build is impossible: %s", err.Error())
 			}
 		}
-		if controller.CanBuildBuilding(OgameController.MINING_BUILDINGS, OgameController.DEUTERIUM_POWER_PLANT) {
+		if ogameController.CanBuildBuilding(controller.MINING_BUILDINGS, controller.DEUTERIUM_POWER_PLANT) {
 			log.Info("Upgrading deuterium power plant because energy is too low")
-			err := controller.BuildBuilding(OgameController.MINING_BUILDINGS, OgameController.DEUTERIUM_POWER_PLANT)
+			err := ogameController.BuildBuilding(controller.MINING_BUILDINGS, controller.DEUTERIUM_POWER_PLANT)
 			if err != nil {
 				log.Warningf("Build is impossible: %s", err.Error())
 			}
@@ -147,9 +146,9 @@ func processUser(userData *user, configData *config) {
 
 	//Build all buildings (temporary)
 	for _, n := range []int{1, 2, 3, 4, 5, 7, 8, 9} {
-		if controller.CanBuildBuilding(OgameController.MINING_BUILDINGS, n) {
+		if ogameController.CanBuildBuilding(controller.MINING_BUILDINGS, n) {
 			log.Info("Upgrading mining building")
-			err := controller.BuildBuilding(OgameController.MINING_BUILDINGS, n)
+			err := ogameController.BuildBuilding(controller.MINING_BUILDINGS, n)
 			if err != nil {
 				log.Warningf("Build is impossible: %s", err.Error())
 			}
@@ -157,9 +156,9 @@ func processUser(userData *user, configData *config) {
 	}
 
 	for _, n := range []int{0, 1, 2, 3, 4, 5, 6, 7} {
-		if controller.CanBuildBuilding(OgameController.STATION_BUILDINGS, n) {
+		if ogameController.CanBuildBuilding(controller.STATION_BUILDINGS, n) {
 			log.Info("Upgrading station building")
-			err := controller.BuildBuilding(OgameController.STATION_BUILDINGS, n)
+			err := ogameController.BuildBuilding(controller.STATION_BUILDINGS, n)
 			if err != nil {
 				log.Warningf("Build is impossible %s", err.Error())
 			}

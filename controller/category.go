@@ -1,4 +1,4 @@
-package OgameController
+package controller
 
 const (
 	MINING_BUILDINGS  = 0

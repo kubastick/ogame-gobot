@@ -1,4 +1,4 @@
-package OgameController
+package controller
 
 const (
 	ROBOT_FACTORY  = 0
