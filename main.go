@@ -9,13 +9,13 @@ import (
 	"time"
 )
 
-var log = setupLogger() //Prepare logger
+var log = setupLogger() // Prepare logger
 
 func main() {
-	//Hello dear users ^^
-	log.Info("Ogame bot. All rights reserved. Copyright 2018 kubastick.")
+	// Hello dear users ^^
+	log.Info("Ogame bot. MIT License. Copyright 2019 kubastick.")
 	log.Info("Getting file list from ./users directory")
-	//Check for config
+	// Check for config
 	configData := config{Headless: true, RoundTime: 120000, SeleniumURL: "http://localhost:4444/wd/hub"}
 	if fileExists("./config.toml") {
 		data, err := ioutil.ReadFile("./config.toml")
@@ -29,22 +29,22 @@ func main() {
 		log.Warning("Can't find config.toml using optimal defaults")
 	}
 
-	//Declare users
+	// Declare users
 	var users []user
 
-	//Load users
+	// Load users
 	if fileExists("./users") {
-		//Load users
+		// Load users
 		files, err := ioutil.ReadDir("./users")
 		if err != nil {
 			log.Fatal(err)
 		}
 		for _, file := range files {
 
-			//Log to console
+			// Log to console
 			log.Info(fmt.Sprintf("Reading file: %s", file.Name()))
 
-			//Read file to ram
+			// Read file to ram
 			data, err := ioutil.ReadFile("./users/" + file.Name())
 			if err != nil {
 				log.Fatal(err)
@@ -55,7 +55,7 @@ func main() {
 			}
 			users = append(users, userData)
 		}
-		//Start infinite loop
+		// Start infinite loop
 		for {
 			nextIterationTime := time.Now().Second()*1000 + configData.RoundTime
 
@@ -91,10 +91,10 @@ func fileExists(name string) bool {
 
 func processUser(userData *user, configData *config) {
 	log.Info("Starting user processing")
-	//Log user name
+	// Log user name
 	log.Info(fmt.Sprintf("User email: %s", userData.Email))
 
-	//Create controller
+	// Create controller
 	ogameController := controller.NewOgameController(
 		configData.SeleniumURL,
 		userData.Email,
@@ -103,9 +103,9 @@ func processUser(userData *user, configData *config) {
 		userData.ServerButtonId,
 		configData.Headless)
 	defer ogameController.Close()
-	//TODO:Load headless from config (UP 1 LINE) ^
+	// TODO:Load headless from config (UP 1 LINE) ^
 
-	//Login
+	// Login
 	log.Info("Logging in")
 	err := ogameController.LoginF()
 	if err != nil {
@@ -113,7 +113,7 @@ func processUser(userData *user, configData *config) {
 		return
 	}
 
-	//Fetch resources
+	// Fetch resources
 	log.Info("Fetching resources")
 	err2 := ogameController.FetchResources()
 	if err2 != nil {
@@ -126,7 +126,7 @@ func processUser(userData *user, configData *config) {
 		ogameController.Deuterium,
 		ogameController.Energy))
 
-	//Upgrade power plants first if energy is too low
+	// Upgrade power plants first if energy is too low
 	if ogameController.Energy < 0 {
 		if ogameController.CanBuildBuilding(controller.MINING_BUILDINGS, controller.POWER_PLANT) {
 			log.Info("Upgrading power plant because energy is too low")
@@ -142,25 +142,25 @@ func processUser(userData *user, configData *config) {
 				log.Warningf("Build is impossible: %s", err.Error())
 			}
 		}
-	}
-
-	//Build all buildings (temporary)
-	for _, n := range []int{1, 2, 3, 4, 5, 7, 8, 9} {
-		if ogameController.CanBuildBuilding(controller.MINING_BUILDINGS, n) {
-			log.Info("Upgrading mining building")
-			err := ogameController.BuildBuilding(controller.MINING_BUILDINGS, n)
-			if err != nil {
-				log.Warningf("Build is impossible: %s", err.Error())
+	} else { // Otherwise try building some buildings
+		// Building all building is temporary
+		for _, n := range []int{1, 2, 3, 4, 5, 7, 8, 9} {
+			if ogameController.CanBuildBuilding(controller.MINING_BUILDINGS, n) {
+				log.Info("Upgrading mining building")
+				err := ogameController.BuildBuilding(controller.MINING_BUILDINGS, n)
+				if err != nil {
+					log.Warningf("Build is impossible: %s", err.Error())
+				}
 			}
 		}
-	}
 
-	for _, n := range []int{0, 1, 2, 3, 4, 5, 6, 7} {
-		if ogameController.CanBuildBuilding(controller.STATION_BUILDINGS, n) {
-			log.Info("Upgrading station building")
-			err := ogameController.BuildBuilding(controller.STATION_BUILDINGS, n)
-			if err != nil {
-				log.Warningf("Build is impossible %s", err.Error())
+		for _, n := range []int{0, 1, 2, 3, 4, 5, 6, 7} {
+			if ogameController.CanBuildBuilding(controller.STATION_BUILDINGS, n) {
+				log.Info("Upgrading station building")
+				err := ogameController.BuildBuilding(controller.STATION_BUILDINGS, n)
+				if err != nil {
+					log.Warningf("Build is impossible %s", err.Error())
+				}
 			}
 		}
 	}
