@@ -12,12 +12,15 @@ import (
 var log = setupLogger() // Prepare logger
 
 func main() {
+	const usersDirName = "./users"
+	const configFileName = "./config.toml"
 	// Hello dear users ^^
 	log.Info("Ogame bot. MIT License. Copyright 2019 kubastick.")
-	log.Info("Getting file list from ./users directory")
+	log.Infof("Getting file list from %s directory", usersDirName)
+
 	// Check for config
 	configData := config{Headless: true, RoundTime: 120000, SeleniumURL: "http://localhost:4444/wd/hub"}
-	if fileExists("./config.toml") {
+	if fileExists(configFileName) {
 		data, err := ioutil.ReadFile("./config.toml")
 		if err != nil {
 			log.Fatal(err)
@@ -26,16 +29,26 @@ func main() {
 			log.Fatal(err)
 		}
 	} else {
-		log.Warning("Can't find config.toml using optimal defaults")
+		log.Warningf("Can't find %s - creating and using new with optimal values", configFileName)
+		file, err := os.Create(configFileName)
+		if err != nil {
+			log.Fatalf("Failed to create config file: %s", err.Error())
+		}
+
+		encoder := toml.NewEncoder(file)
+		err = encoder.Encode(configData)
+		if err != nil {
+			log.Fatalf("Failed to encode config file data: %s", err.Error())
+		}
 	}
 
 	// Declare users
 	var users []user
 
 	// Load users
-	if fileExists("./users") {
+	if fileExists(usersDirName) {
 		// Load users
-		files, err := ioutil.ReadDir("./users")
+		files, err := ioutil.ReadDir(usersDirName)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -74,7 +87,11 @@ func main() {
 			}
 		}
 	} else {
-		log.Fatal("Directory ./users does not exists, exiting")
+		log.Warningf("Directory %s does not exists, creating one and exiting", usersDirName)
+		err := os.Mkdir(usersDirName, os.ModePerm)
+		if err != nil {
+			log.Fatalf("Failed to create %s dir", usersDirName)
+		}
 	}
 
 	/*service, err := selenium.NewRemote(selenium.Capabilities{"browserName":"Chrome"},"http://localhost:4444/wd/hub")
