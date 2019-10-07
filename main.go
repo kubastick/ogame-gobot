@@ -1,19 +1,31 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"ogamebot/controller"
 	"os"
+	"path"
 	"time"
 )
 
-var log = setupLogger() // Prepare logger
+var (
+	log         = setupLogger() // Prepare logger
+	userGenFlag = flag.Bool("generate-user", false, "generates new user config file")
+)
+
+const (
+	usersDirName   = "./users"
+	configFileName = "./config.toml"
+)
 
 func main() {
-	const usersDirName = "./users"
-	const configFileName = "./config.toml"
+
+	// Parse flags
+	parseArgs()
+
 	// Hello dear users ^^
 	log.Info("Ogame bot. MIT License. Copyright 2019 kubastick.")
 	log.Infof("Getting file list from %s directory", usersDirName)
@@ -99,6 +111,34 @@ func main() {
 		logger.Fatal(err)
 	}
 	defer service.Quit()*/
+}
+
+func parseArgs() {
+	flag.Parse()
+	if *userGenFlag {
+		log.Info("Generating empty user file")
+		err := generateEmptyUserFile("new-user")
+		if err != nil {
+			log.Fatalf("Failed to generate empty user file: %s", err.Error())
+		}
+		log.Info("User file generated - exiting")
+		os.Exit(0)
+	}
+}
+
+func generateEmptyUserFile(username string) error {
+	userFile, err := os.Create(path.Join(usersDirName, username+".toml"))
+	if err != nil {
+		return err
+	}
+
+	encoder := toml.NewEncoder(userFile)
+	err = encoder.Encode(&user{})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func fileExists(name string) bool {
