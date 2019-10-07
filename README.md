@@ -19,17 +19,17 @@ Files:
 `config.toml` - General settings: Round time, optional slack bot id, etc.  
 Example file content:
 ```
-roundTime = 2_400_000 #Round time in miliseconds, see FAQ
-headless = true #Use headless chrome (run in background)
-seleniumAdress = "http://localhost:4444/wd/hub" #Selenium Chrome WebDriver adress
+roundTime = 2_400_000 # Round time in miliseconds, see FAQ
+headless = true # Use headless chrome (run in background)
+seleniumAdress = "http://localhost:4444/wd/hub" # Selenium Chrome WebDriver adress
 ```
 `./users/userfile.toml` - User data  
 Example file content:
 ```
-email = "user@email.com" #User email
-password = "123456" #User password
-server = "https://s155-pl.ogame.gameforge.com/game" #Server adress
-serverButtonID = 11 #If your account have only 1 universe, leave this alone
+email = "user@email.com" # User email
+password = "123456" # User password
+server = "https://s155-pl.ogame.gameforge.com/game" # Server adress
+serverButtonID = 11 # If your account have only 1 universe, leave this alone
 ```
 Bot require Selenium Remote Chromedriver running (see config.toml)
 ## Abilities
