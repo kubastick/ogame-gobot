@@ -1,4 +1,6 @@
 # Ogame GO-Bot
+[![Go Report Card](https://goreportcard.com/badge/github.com/kubastick/ogame-gobot)](https://goreportcard.com/report/github.com/kubastick/ogame-gobot)  
+  
 Simple OGame bot that interacts with your account.
 ## Motivation
 I wanted to learn how to use selenium, so the first thing that came to my head was the good old ogame
